@@ -67,7 +67,8 @@ npx playwright show-report
 * Remove products from the cart
 * Log in and log out
 * Complete a purchase with confirmation dialog
-⚠️ Note: Full checkout / purchase flow is not automated. The tests handle only adding/removing items from cart and login/logout.
+
+* ⚠️ Note: Full checkout / purchase flow is not automated. The tests handle only adding/removing items from cart and login/logout.
 ---
 
 ## 🧰 Useful Commands
