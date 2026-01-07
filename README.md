@@ -127,5 +127,3 @@ Check the `test-results/` folder after running the tests.
 * Re-run `npx playwright install` after Playwright upgrades.
 
 ---
-
-```
