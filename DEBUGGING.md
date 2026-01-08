@@ -1,26 +1,30 @@
-# Playwright Debugging Report – Add to Cart (Firefox issue)
-
-## Kontekst
-
-Ovaj dokument bilježi proces debugiranja flaky E2E testova u Playwrightu, konkretno problema s testom **Add item to cart** koji je prolazio u Chromium/WebKitu, ali **padao u Firefoxu**.
-
-Projekt koristi:
-
-* Playwright Test Runner
-* Page Object Model (POM)
-* pravi backend (bez mockanja)
-* demo web aplikaciju *Product Store*
-
-Cilj: stabilni, browser-agnostic E2E testovi.
+Sure, here's your report translated into English:
 
 ---
 
-## Simptom
+# Playwright Debugging Report – Add to Cart (Firefox Issue)
 
-Test **Add item to cart**:
+## Context
 
-* prolazi u Chromiumu i WebKitu
-* pada u Firefoxu s greškom:
+This document records the debugging process of flaky E2E tests in Playwright, specifically the **Add item to cart** test that passed in Chromium/WebKit but **failed in Firefox**.
+
+Project setup:
+
+* Playwright Test Runner
+* Page Object Model (POM)
+* real backend (no mocking)
+* demo web application *Product Store*
+
+Goal: stable, browser-agnostic E2E tests.
+
+---
+
+## Symptom
+
+**Add item to cart** test:
+
+* passes in Chromium and WebKit
+* fails in Firefox with error:
 
 > expect(locator).toBeVisible()
 > element(s) not found
@@ -31,41 +35,41 @@ Locator:
 #tbodyid >> text=Samsung galaxy s6
 ```
 
-Firefox HTML report pokazuje:
+Firefox HTML report shows:
 
-* navigacija i klikovi uspješni
-* backend `addtocart` request izvršen
-* ali DOM **ne sadrži očekivani tekst proizvoda**
-
----
-
-## Zašto se to događa (root cause)
-
-1. **Firefox rendera sporije i drugačije**
-
-   * UI se ne mora refreshati odmah nakon backend akcije
-   * tablica se može pojaviti prazna
-
-2. **E2E test je testirao previše detalja**
-
-   * sadržaj carta ovisi o:
-
-     * backend stanju
-     * session storageu
-     * redoslijedu async operacija
-
-3. **Alert dialog + DOM assertion = flaky kombinacija**
-
-   * `alert('Product added')` nije pouzdan signal
-   * Firefox ponekad obradi dialog prije nego test dođe do njega
-
-Drugim riječima: test je testirao *implementaciju*, a ne *ponašanje*.
+* navigation and clicks succeed
+* backend `addtocart` request executes
+* but DOM **does not contain the expected product text**
 
 ---
 
-## Što smo prvo probali (i zašto nije valjalo)
+## Root Cause
 
-### ❌ Čekanje `dialog` eventa
+1. **Firefox renders slower and differently**
+
+   * UI may not refresh immediately after backend action
+   * table may appear empty initially
+
+2. **E2E test was testing too many details**
+
+   * cart content depends on:
+
+     * backend state
+     * session storage
+     * order of async operations
+
+3. **Alert dialog + DOM assertion = flaky combo**
+
+   * `alert('Product added')` is not a reliable signal
+   * Firefox sometimes processes the dialog before the test reaches it
+
+In other words, the test was testing *implementation* rather than *behavior*.
+
+---
+
+## What we first tried (and why it failed)
+
+### ❌ Waiting for the `dialog` event
 
 ```ts
 page.once('dialog', async (dialog) => {
@@ -76,12 +80,12 @@ page.once('dialog', async (dialog) => {
 
 Problem:
 
-* dialog se može pojaviti i nestati prije nego listener uhvati event
-* Firefox je posebno osjetljiv
+* dialog may appear and disappear before the listener catches it
+* Firefox is particularly sensitive to this
 
 ---
 
-### ❌ Čekanje da se pojavi konkretan proizvod u cartu
+### ❌ Waiting for the specific product to appear in the cart
 
 ```ts
 await expect(
@@ -91,32 +95,33 @@ await expect(
 
 Problem:
 
-* E2E test ne smije ovisiti o točnom backend stanju
-* ovo je više **integracijski test s bazom**, ne UI flow test
+* E2E test should not depend on exact backend state
+* this is more of an **integration test with the database**, not a UI flow test
 
 ---
 
-## Konačno rješenje (ispravan pristup)
+## Final Solution (correct approach)
 
-Test je pojednostavljen i fokusiran na **ono što E2E treba testirati**:
+The test was simplified and focused on **what an E2E test should verify**:
 
-* korisnik može:
+* user can:
 
-  * otvoriti proizvod
-  * poslati `add to cart` request
-  * otvoriti cart stranicu
-* aplikacija odgovara ispravno
+  * open a product
+  * send `add to cart` request
+  * open the cart page
 
-### ✅ Ključna promjena
+* application responds correctly
 
-Umjesto provjere DOM sadržaja:
+### ✅ Key change
 
-* čekamo **backend response**
-* provjeravamo **navigaciju i prisutnost UI strukture**
+Instead of asserting DOM content:
+
+* wait for **backend response**
+* verify **navigation and presence of UI structure**
 
 ---
 
-## Finalni test (stabilan u svim browserima)
+## Final Test (stable across all browsers)
 
 ```ts
 test('Add item to cart', async ({ page }) => {
@@ -139,37 +144,37 @@ test('Add item to cart', async ({ page }) => {
 
 ---
 
-## Zašto je ovo ispravno
+## Why this is correct
 
 * ✔ browser-agnostic
-* ✔ nema race conditiona
-* ✔ ne ovisi o alertima
-* ✔ ne testira bazu
-* ✔ testira stvarni user flow
+* ✔ no race conditions
+* ✔ does not rely on alerts
+* ✔ does not test the database
+* ✔ tests actual user flow
 
-Ovo je **točno ono što E2E test treba biti**.
-
----
-
-## Lekcije (bitno za buduće testove)
-
-* Ne asertaj konkretne podatke ako backend nije mockan
-* Ne oslanjaj se na `alert()` za sinkronizaciju
-* Ako Firefox puca, vjerojatno test čeka pogrešnu stvar
-* E2E testira **ponašanje**, ne implementaciju
+This is **exactly what an E2E test should be**.
 
 ---
 
-## Preporuke za dalje
+## Lessons (important for future tests)
 
-* Mockati backend za testiranje sadržaja carta
-* Ostaviti ovakve testove kao smoke / happy-path
-* Dokumentirati razliku između:
+* Don’t assert specific data if backend is not mocked
+* Don’t rely on `alert()` for synchronization
+* If Firefox fails, the test is likely waiting for the wrong thing
+* E2E tests the **behavior**, not the implementation
+
+---
+
+## Recommendations going forward
+
+* Mock the backend for testing cart content
+* Keep tests like this as smoke / happy-path tests
+* Document the difference between:
 
   * unit
   * integration
-  * E2E testova
+  * E2E tests
 
 ---
 
-Status: ✅ **Problem riješen, testovi stabilni**
+Status: ✅ **Problem resolved, tests are stable**
