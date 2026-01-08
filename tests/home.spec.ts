@@ -1,25 +1,28 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../POMs/HomePage';
-import { LoginPage } from '../POMs/loginPage';
+import { test, expect } from '@playwright/test';
+import HomePage from '../POMs/HomePage';
+import CartPage from '../POMs/CartPage';
 
 let homePage: HomePage;
-let loginPage: LoginPage;
+let cartPage: CartPage;
 
 test.beforeEach(async ({ page }) => {
-  homePage = new HomePage(page);
-  loginPage = new LoginPage(page);
-
-  await homePage.open();
-  await loginPage.openLoginModal();
-  await loginPage.login(process.env.CORRECT_EMAIL!, process.env.CORRECT_PASSWORD!);
-  await homePage.assertLoggedIn(); // provjera da je login uspio
+    homePage = new HomePage(page);
+    cartPage = new CartPage(page);
+    await page.goto(process.env.BASE_URL!);
 });
 
-test('Logged-in user can see products', async ({ page }) => {
-  await homePage.assertProductsVisible();
-});
+test('Add item to cart', async ({ page }) => {
+  await homePage.navigateToCategory('Phones');
+  await homePage.openProduct('Samsung galaxy s6');
 
-test('User can logout', async ({ page }) => {
-  await homePage.logout();
-  await homePage.assertLoggedOut();
+  const addToCartResponse = page.waitForResponse(res =>
+    res.url().includes('addtocart') && res.status() === 200
+  );
+
+  await cartPage.addItemToCart();
+  await addToCartResponse;
+
+  await cartPage.openCart();
+  await expect(page).toHaveURL(/cart\.html/);
+  await expect(page.locator('#tbodyid')).toBeVisible();
 });

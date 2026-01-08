@@ -1,36 +1,42 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export class HomePage {
-  readonly page: Page;
-  readonly logoutButton: Locator;
+    readonly page: Page;
+    readonly productCards: Locator;
+    readonly homeLink: Locator;
+    readonly categoryLinkPhones: Locator;
+    readonly categoryLinkLaptops: Locator;
+    readonly categoryLinkMonitors: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
-    this.logoutButton = page.locator('#logout2');
-  }
+    constructor(page: Page) {
+        this.page = page;
+        this.homeLink = page.getByRole('link', { name: 'Home', exact: true });
+        this.categoryLinkPhones = page.getByRole('link', { name: 'Phones', exact: true });
+        this.categoryLinkLaptops = page.getByRole('link', { name: 'Laptops', exact: true });
+        this.categoryLinkMonitors = page.getByRole('link', { name: 'Monitors', exact: true });
+        this.productCards = page.locator('.card');
+    }
 
-  async open() {
-    await this.page.goto(process.env.BASE_URL!);
-  }
+    async open() {
+        await this.page.goto(process.env.BASE_URL!, { waitUntil: 'domcontentloaded' });
+    }
 
-  async logout() {
-    await this.logoutButton.waitFor({ state: 'visible', timeout: 10000 });
-    await this.logoutButton.click();
-  }
+    async assertProductsVisible() {
+        await expect(this.productCards.first()).toBeVisible();
+    }
 
-  async assertLoggedOut() {
-    // čekaj da logout button više nije vidljiv
-    await expect(this.logoutButton).toBeHidden({ timeout: 5000 });
-  }
+    async navigateToCategory(category: 'Phones' | 'Laptops' | 'Monitors') {
+        switch (category) {
+            case 'Phones': await this.categoryLinkPhones.click(); break;
+            case 'Laptops': await this.categoryLinkLaptops.click(); break;
+            case 'Monitors': await this.categoryLinkMonitors.click(); break;
+        }
+    }
 
-  async assertLoggedIn() {
-    await expect(this.logoutButton).toBeVisible({ timeout: 10000 });
-  }
-
-  async assertProductsVisible() {
-    const products = this.page.locator('.hrefch');
-    await expect(products.first()).toBeVisible();
-    const count = await products.count();
-    expect(count).toBeGreaterThan(0);
-  }
+    async openProduct(itemName: string) {
+        const item = this.page.getByRole('link', { name: itemName, exact: true });
+        await item.click();
+    }
 }
+
+export default HomePage;

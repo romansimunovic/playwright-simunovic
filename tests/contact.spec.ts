@@ -1,19 +1,28 @@
-import { test } from '@playwright/test';
-import { ContactPage } from '../POMs/contactPage';
+import { test, expect } from '@playwright/test';
+import HomePage from '../POMs/HomePage';
+import ContactPage from '../POMs/ContactPage';
 
+let homePage: HomePage;
 let contactPage: ContactPage;
 
 test.beforeEach(async ({ page }) => {
+  homePage = new HomePage(page);
   contactPage = new ContactPage(page);
   await page.goto(process.env.BASE_URL!);
 });
 
-test('User can send contact message', async ({ page }) => {
+test('Send contact message', async ({ page }) => {
   await contactPage.openContactModal();
 
-  // generiraj ili koristi statične podatke
-  await contactPage.sendMessage('test@example.com', 'Roman', 'Hello from automation!');
+  await contactPage.sendMessage(
+    'test@test.com',
+    'Roman',
+    'Hello from Playwright!'
+  );
 
-  // malo čekanja da alert bude prihvaćen (ako treba)
-  await page.waitForTimeout(500);
+  // čekaj alert i assert
+  page.once('dialog', async dialog => {
+    expect(dialog.message()).toContain('Thanks for the message');
+    await dialog.accept();
+  });
 });

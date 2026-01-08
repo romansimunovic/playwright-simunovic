@@ -1,22 +1,27 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export class CartPage {
-  readonly page: Page;
-  readonly cartNav: Locator;
-  readonly firstProductInCart: Locator;
+    readonly page: Page;
+    readonly cartLink: Locator;
+    readonly addToCartButton: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
-    this.cartNav = page.locator('#cartur');
-    this.firstProductInCart = page.locator('tr', { hasText: 'Samsung' }).first(); // placeholder
-  }
+    constructor(page: Page) {
+        this.page = page;
+        this.cartLink = page.getByRole('link', { name: 'Cart', exact: true });
+        this.addToCartButton = page.getByRole('link', { name: 'Add to cart', exact: true });
+    }
 
-  async openCart() {
-    await this.cartNav.click();
-  }
+    async openCart() {
+        await expect(this.cartLink).toBeVisible({ timeout: 10000 });
+        await this.cartLink.click();
+        await expect(this.page).toHaveURL(`${process.env.BASE_URL}/cart.html`, { timeout: 10000 });
+    }
 
-  async assertItemInCart(itemName: string) {
-    const item = this.page.locator('tr', { hasText: itemName });
-    await expect(item.first()).toBeVisible();
-  }
+   async addItemToCart() {
+  await expect(this.addToCartButton).toBeVisible({ timeout: 10000 });
+  await this.addToCartButton.click();
 }
+
+}
+
+export default CartPage;
