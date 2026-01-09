@@ -14,22 +14,16 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL,
     headless: false,
-    trace: 'on-first-retry',
-    actionTimeout: 20000, // 20s za akcije
-    navigationTimeout: 40000 // 40s za učitavanje
-},
+    actionTimeout: 30000,
+    navigationTimeout: 30000,
+    ignoreHTTPSErrors: true,
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+  },
+  timeout: 60000,
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
 });

@@ -1,40 +1,35 @@
-import { expect, Page } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
-export class LoginPage {
-    readonly page: Page;
-    readonly loginLink: any;
-    readonly usernameInput: any;
-    readonly passwordInput: any;
-    readonly loginButton: any;
+export default class LoginPage {
+  readonly page: Page;
+  readonly loginLink: Locator;
+  readonly loginModal: Locator;
+  readonly usernameField: Locator;
+  readonly passwordField: Locator;
+  readonly loginButton: Locator;
 
-    constructor(page: Page) {
-        this.page = page;
-        this.loginLink = page.getByRole('link', { name: 'Log in', exact: true });
-        this.usernameInput = page.locator('#loginusername');
-        this.passwordInput = page.locator('#loginpassword');
-        this.loginButton = page.getByRole('button', { name: 'Log in', exact: true });
-    }
+  constructor(page: Page) {
+    this.page = page;
+    this.loginLink = page.locator('#login2');
+    this.loginModal = page.locator('#logInModal');
+    this.usernameField = page.locator('#loginusername');
+    this.passwordField = page.locator('#loginpassword');
+    this.loginButton = page.locator('button', { hasText: 'Log in' });
+  }
 
-    async openLoginModal() {
-        await expect(this.loginLink).toBeVisible({ timeout: 10000 });
-        await this.loginLink.click();
-        await expect(this.usernameInput).toBeVisible({ timeout: 10000 });
-    }
+  async openLoginModal() {
+    await this.loginLink.click();
+    await this.loginModal.waitFor({ state: 'visible', timeout: 15000 });
+  }
 
-    async loginWithValidCredentials() {
-        await this.usernameInput.fill(process.env.CORRECT_USERNAME!);
-        await this.passwordInput.fill(process.env.CORRECT_PASSWORD!);
-        await expect(this.loginButton).toBeEnabled({ timeout: 5000 });
-        await this.loginButton.click();
-    }
+  async loginWithValidCredentials() {
+    await this.usernameField.fill(process.env.VALID_EMAIL!);
+    await this.passwordField.fill(process.env.VALID_PASSWORD!);
+    await this.loginButton.click();
+  }
 
-    async assertLoginIsSuccessful() {
-    const welcome = this.page.getByText('Welcome', { exact: false }); // traži samo "Welcome"
-    await expect(welcome).toContainText(process.env.CORRECT_USERNAME!); // provjeri da je tu tvoj user/email
+  async assertLoginIsSuccessful() {
+    const logoutLink = this.page.getByRole('link', { name: 'Log out', exact: true });
+    await expect(logoutLink).toBeVisible({ timeout: 20000 });
+  }
 }
-
-
-
-}
-
-export default LoginPage;

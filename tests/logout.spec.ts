@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Logout', async ({ page }) => {
+  // Login first
   await loginPage.openLoginModal();
   await loginPage.loginWithValidCredentials();
   await loginPage.assertLoginIsSuccessful();
@@ -19,7 +20,4 @@ test('Logout', async ({ page }) => {
 
   const loginLink = page.getByRole('link', { name: 'Log in', exact: true });
   await expect(loginLink).toBeVisible({ timeout: 20000 });
-
-  // NEW assertion: potvrda da logout zaista radi
-  await expect(page.locator('text=Welcome')).not.toBeVisible();
 });

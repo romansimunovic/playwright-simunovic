@@ -14,12 +14,14 @@ test('Sign up with existing user shows alert', async ({ page }) => {
   const dialogPromise = page.waitForEvent('dialog');
 
   await signUpPage.signUp(
-    process.env.CORRECT_EMAIL!,
-    process.env.CORRECT_PASSWORD!
+    process.env.VALID_EMAIL!,
+    process.env.VALID_PASSWORD!
   );
 
   const dialog = await dialogPromise;
   expect(dialog.message()).toContain('This user already exist.');
   await dialog.accept();
-});
 
+  // NEW assertion: modal i dalje otvoren (nije kreiran novi user)
+  await expect(signUpPage.signupModal).toBeVisible();
+});

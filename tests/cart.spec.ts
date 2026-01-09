@@ -15,26 +15,19 @@ test('Add item to cart', async ({ page }) => {
   await homePage.navigateToCategory('Phones');
   await homePage.openProduct('Samsung galaxy s6');
 
-  // čekaj backend call
   const addToCartResponse = page.waitForResponse(res =>
     res.url().includes('addtocart') && res.status() === 200
   );
 
-  // klik add to cart
   await cartPage.addItemToCart();
-
   await addToCartResponse;
 
-  // otvori cart
   await cartPage.openCart();
 
-  // samo potvrdi da si na cart stranici
   await expect(page).toHaveURL(/cart\.html/);
-
-  // i da je tablica prisutna (ne sadržaj)
   await expect(page.locator('#tbodyid')).toBeVisible();
+
+  // NEW assertion: provjera da bar jedan proizvod postoji
+  const rows = page.locator('#tbodyid tr');
+  await expect(await rows.count()).toBeGreaterThan(0);
 });
-
-
-
-

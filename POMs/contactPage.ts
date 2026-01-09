@@ -1,44 +1,42 @@
-import { expect, Locator, Page } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
-export class ContactPage {
-    readonly page: Page;
-    readonly contactLink: Locator;
-    readonly emailInput: Locator;
-    readonly nameInput: Locator;
-    readonly messageInput: Locator;
-    readonly sendButton: Locator;
+export default class ContactPage {
+  readonly page: Page;
+  readonly contactLink: Locator;
+  readonly contactModal: Locator;
+  readonly emailField: Locator;
+  readonly nameField: Locator;
+  readonly messageField: Locator;
+  readonly sendButton: Locator;
 
-    constructor(page: Page) {
-        this.page = page;
-        this.contactLink = page.getByRole('link', { name: 'Contact', exact: true });
-        this.emailInput = page.locator('#recipient-email');
-        this.nameInput = page.locator('#recipient-name');
-        this.messageInput = page.locator('#message-text');
-        this.sendButton = page.getByRole('button', { name: 'Send message', exact: true });
-    }
+  constructor(page: Page) {
+    this.page = page;
+    this.contactLink = page.locator('#navbarExample a', { hasText: 'Contact' });
+    this.contactModal = page.locator('#exampleModal');
+    this.emailField = page.locator('#recipient-email');
+    this.nameField = page.locator('#recipient-name');
+    this.messageField = page.locator('#message-text');
+    this.sendButton = page.locator('button', { hasText: 'Send message' });
+  }
 
-    async openContactModal() {
-  await this.contactLink.click();
+  async openContactModal() {
+    await expect(this.contactLink).toBeVisible({ timeout: 15000 });
+    await this.contactLink.scrollIntoViewIfNeeded();
+    await this.contactLink.click();
+    await expect(this.contactModal).toBeVisible({ timeout: 15000 });
+  }
 
-  await this.page.waitForSelector('#exampleModal.show', {
-    timeout: 15000,
-  });
+  async sendMessage(email: string, name: string, message: string) {
+    await this.emailField.fill(email);
+    await this.nameField.fill(name);
+    await this.messageField.fill(message);
 
-  await expect(this.emailInput).toBeVisible();
+    // listen once for dialog
+    this.page.once('dialog', async dialog => {
+      expect(dialog.message()).toContain('Thanks for the message');
+      await dialog.accept();
+    });
+
+    await this.sendButton.click();
+  }
 }
-
-
-    async sendMessage(email: string, name: string, message: string) {
-        this.page.once('dialog', async dialog => {
-            expect(dialog.message()).toContain('Thanks for the message');
-            await dialog.accept();
-        });
-        await this.emailInput.fill(email);
-        await this.nameInput.fill(name);
-        await this.messageInput.fill(message);
-        await expect(this.sendButton).toBeEnabled({ timeout: 5000 });
-        await this.sendButton.click();
-    }
-}
-
-export default ContactPage;

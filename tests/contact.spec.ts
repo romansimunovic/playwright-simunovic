@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import HomePage from '../POMs/HomePage';
-import ContactPage from '../POMs/ContactPage';
+import ContactPage from '../POMs/contactPage';
 
 let homePage: HomePage;
 let contactPage: ContactPage;
@@ -13,16 +13,8 @@ test.beforeEach(async ({ page }) => {
 
 test('Send contact message', async ({ page }) => {
   await contactPage.openContactModal();
+  await contactPage.sendMessage('test@test.com', 'Roman', 'Hello!');
 
-  await contactPage.sendMessage(
-    'test@test.com',
-    'Roman',
-    'Hello from Playwright!'
-  );
-
-  // čekaj alert i assert
-  page.once('dialog', async dialog => {
-    expect(dialog.message()).toContain('Thanks for the message');
-    await dialog.accept();
-  });
+  // NEW assertion: modal više nije vidljiv
+  await expect(contactPage.contactModal).toBeHidden({ timeout: 5000 });
 });
