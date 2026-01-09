@@ -9,22 +9,6 @@ This project documents the **end-to-end (E2E) testing** of [Demoblaze](https://w
 
 ---
 
-## Table of Contents
-
-1. [Project Overview](#project-overview)
-2. [Technology Stack](#technology-stack)
-3. [Setup and Installation](#setup-and-installation)
-4. [Testing Methodology](#testing-methodology)
-
-   * [Page Object Model](#page-object-model-pom)
-   * [Test Scenarios](#test-scenarios)
-5. [Common Issues and Challenges](#common-issues-and-challenges)
-6. [AI Assistance](#ai-assistance)
-7. [Test Execution and Reporting](#test-execution-and-reporting)
-8. [Recommendations](#recommendations)
-9. [Conclusion](#conclusion)
-
----
 
 ## 1. Project Overview
 
