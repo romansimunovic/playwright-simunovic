@@ -1,9 +1,9 @@
 # Demoblaze E2E Testing with Playwright
 
-**Author:** Roman Šimunović
-**Mentor:** Katarina Đuđrević
-**Course:** Supportive Information Processes (2nd year, Master’s IT)
-**Institution:** Faculty of Humanities and Social Sciences, University of Osijek
+* **Author:** Roman Šimunović
+* **Mentor:** Katarina Đuđrević
+* **Course:** Supportive Information Processes (2nd year, Master’s IT)
+* **Institution:** Faculty of Humanities and Social Sciences, University of Osijek
 
 This project documents the **end-to-end (E2E) testing** of [Demoblaze](https://www.demoblaze.com/) using **Playwright**, **TypeScript**, and the **Page Object Model (POM)**. It includes realistic user flows, automated assertions, and documentation of encountered issues and solutions. AI tools such as **ChatGPT** and **Perplexity** were used to generate boilerplate, optimize POM structure, and help debug browser-specific issues.
 
