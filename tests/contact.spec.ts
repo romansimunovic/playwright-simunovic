@@ -15,6 +15,6 @@ test('Send contact message', async ({ page }) => {
   await contactPage.openContactModal();
   await contactPage.sendMessage('test@test.com', 'Roman', 'Hello!');
 
-  // NEW assertion: modal više nije vidljiv
+  // assertion: modal više nije vidljiv
   await expect(contactPage.contactModal).toBeHidden({ timeout: 5000 });
 });

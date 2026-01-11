@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 test('Products are visible on home', async () => {
   await homePage.assertProductsVisible();
 
-  // NEW assertion: provjera da je barem jedan proizvod vidljiv
+  // assertion: provjera da je barem jedan proizvod vidljiv
   const productCount = await homePage.productCards.count();
   await expect(productCount).toBeGreaterThan(0);
 });

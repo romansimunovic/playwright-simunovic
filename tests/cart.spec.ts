@@ -27,7 +27,7 @@ test('Add item to cart', async ({ page }) => {
   await expect(page).toHaveURL(/cart\.html/);
   await expect(page.locator('#tbodyid')).toBeVisible();
 
-  // NEW assertion: provjera da bar jedan proizvod postoji
+  //  assertion: provjera da bar jedan proizvod postoji
   const rows = page.locator('#tbodyid tr');
   await expect(await rows.count()).toBeGreaterThan(0);
 });

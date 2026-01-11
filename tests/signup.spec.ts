@@ -22,6 +22,6 @@ test('Sign up with existing user shows alert', async ({ page }) => {
   expect(dialog.message()).toContain('This user already exist.');
   await dialog.accept();
 
-  // NEW assertion: modal i dalje otvoren (nije kreiran novi user)
+  // assertion: modal i dalje otvoren (nije kreiran novi user)
   await expect(signUpPage.signupModal).toBeVisible();
 });
