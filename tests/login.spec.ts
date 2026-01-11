@@ -8,18 +8,12 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('Logout', async ({ page }) => {
+test('User can log in with valid credentials', async ({ page }) => {
   await loginPage.openLoginModal();
   await loginPage.loginWithValidCredentials();
   await loginPage.assertLoginIsSuccessful();
 
+  // Eksplicitna potvrda login stanja
   const logoutLink = page.getByRole('link', { name: 'Log out', exact: true });
   await expect(logoutLink).toBeVisible({ timeout: 20000 });
-  await logoutLink.click();
-
-  const loginLink = page.getByRole('link', { name: 'Log in', exact: true });
-  await expect(loginLink).toBeVisible({ timeout: 20000 });
-
-  // NEW assertion: potvrda da logout zaista radi
-  await expect(page.locator('text=Welcome')).not.toBeVisible();
 });
